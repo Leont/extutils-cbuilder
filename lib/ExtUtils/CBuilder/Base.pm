@@ -47,7 +47,9 @@ sub new {
     }
     unless ( exists $self->{config}{cxx} ) {
       $self->{config}{cxx} = $self->{config}{cc};
-      $self->{config}{cxxflags} = join( ' ', '-x c++', $self->{config}{cflags} );
+      my $cflags = $self->{config}{cflags};
+      $self->{config}{cxxflags} = '-x c++';
+      $self->{config}{cxxflags} .= " $cflags" if defined $cflags;
     }
   }
 
@@ -162,7 +164,7 @@ sub have_compiler {
 
   # don't clobber existing files (rare, but possible)
   my ( $FH, $tmpfile ) = tempfile( "compilet-XXXXX", SUFFIX => $suffix );
-  binmode $FH, ":text";
+  binmode $FH;
 
   if ( $is_cplusplus ) {
     print $FH "class Bogus { public: int boot_compilet() { return 1; } };\n";
